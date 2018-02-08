@@ -27,7 +27,8 @@ String::String(const char *str){
         this->str_[i] = str[i];
     }
 
-    //закрываем строку терминирующим нулём
+    // закрываем строку терминирующим нулём, т.к. у нас есть c_str() нужно поддерживать валидную си строку
+    // иначе 0 на конце не нужен, у нас и так есть поле length_
     this->str_[length_] = '\0';
 }
 
@@ -61,21 +62,20 @@ String& String::operator= (const String &other){
     // здесь логика похожа на ту которая реализована в конструкторе, за исключением того, что нам нужно позаботиться
     // об освобождении ресурсов объекта если до копирования в него новой строки он уже содержал код
     // + страндартный синтаксис перегрузки оператора =
-    if (this->str_ != nullptr)
-    {
+    if(*this != other) { // Если присвоили самому себе, то ничего копировать не нужно
         delete[] str_;
+
+        length_ = strlen(other.str_);
+        this->str_ = new char[length_ + 1];
+
+        for (int i = 0; i < length_; i++) {
+            this->str_[i] = other.str_[i];
+        }
+
+        this->str_[length_] = '\0';
+
+        return *this;
     }
-
-    length_ = strlen(other.str_);
-    this->str_ = new char[length_ + 1];
-
-    for (int i = 0; i < length_; i++){
-        this->str_[i] = other.str_[i];
-    }
-
-    this->str_[length_] = '\0';
-
-    return *this;
 }
 
 String& String::operator=(String&& p){
@@ -137,6 +137,59 @@ bool String::operator!=(const String & other) const {
     return !(this->operator==(other));
 }
 
+// попытаться извлеч число в системе счисления base из строки
+int String::parseInt(int base) const {
+    int num = 0, sign = 1, s = 0;
+
+    for(;s<length_ && isspace(s);s++); // Игнор пробелов в начале
+
+    // Обработка знака
+    if(str_[s] == '-'){
+        sign = -1;
+        s++;
+    }else if(str_[s] == '+'){
+        sign = 1;
+        s++;
+    }
+    // Проверка основания
+    if(base < 2 || base > 32) throw std::range_error("Invalid base."); // !TODO exceptions
+
+    // Пытаемся считать число в НАЧАЛЕ строки
+    for(int i = s; (i < length_) && isalnum(str_[i]); i++){
+        char d, c = str_[i];
+        if(isdigit(c))
+            d = c -'0'; // Встретилась цифра
+        else if(islower(c)){
+            d = c - 'a' + (char)10; // Встретилась буква a = 10, b = 11....
+        }
+
+        if(d>=0 && d< base){
+            num*=base;
+            num+=d;
+        }else{
+            break; // Встетилась цифра/буква, которой нет в системе счисления с основанием base
+        }
+    }
+
+    return sign*num;
+}
+
+// Инверсия строки, возможно лучше чтобы возвращалась инвертированая копия, но зато этот метод не требует доп. памяти
+void String::reverse() {
+    int l = 0, r = length_-1;
+    while(l < r){
+        std::swap(str_[l++], str_[r--]);
+    }
+}
+
+// Заполнение строки
+void String::fill(char ch) {
+    for(int i = 0; i < length_; i++){
+        str_[i] = ch;
+    }
+}
+
+// Лексикографическое сравнение (по символам)
 bool String::operator>(const String &other) const {
 
     for (int i = 0; i < std::min(this->length_, other.length_); i++){
@@ -146,56 +199,6 @@ bool String::operator>(const String &other) const {
     }
 
     return this->length_ > other.length_;
-
-}
-
-int String::parseInt(int base) const {
-    int num = 0, sign = 1, s = 0;
-
-    if(str_[0] == '-'){
-        sign = -1;
-        s = 1;
-    }else if(str_[0] == '+'){
-        sign = 1;
-        s = 1;
-    }
-
-    if(base < 2 || base > 32) return -1; // !TODO exceptions
-
-    for(int i = s; (i < length_) && isalnum(str_[i]); i++){
-
-        auto convert = [](char c){
-            c = tolower(c);
-            if(isdigit(c))
-                return c -'0';
-            else if(islower(c)){
-                return (c - 'a' + (char)10);
-            }
-        };
-
-        char d = convert(str_[i]);
-        //printf("%c", d);
-        if(d>=0 && d< base){
-            num*=base;
-            num+=d;
-        }else{
-            return -1;
-        }
-    }
-    return sign*num;
-}
-
-void String::reverse() {
-    int l = 0, r = length_-1;
-    while(l < r){
-        std::swap(str_[l++], str_[r--]);
-    }
-}
-
-void String::fill(char ch) {
-    for(int i = 0; i < length_; i++){
-        str_[i] = ch;
-    }
 }
 
 bool String::operator<(const String &other) const {
@@ -219,13 +222,19 @@ char String::operator[](int index) const{
 }
 
 std::istream& operator>>(std::istream &is, String &str) {
-    delete str.str_;
+    delete str.str_; // удаляем то что было
     constexpr size_t kMaxSize = 5000;
 
-    str.str_ = new char[kMaxSize]; // Лучше бы table doubling намутила
+    char buf[kMaxSize]; // буфер на стеке в котором будет введенная строка, благо istream умеет вводить си строки
+    is>>buf;
 
-    is>>str.str_;
-    str.length_=strlen(str.str_);
+    str.length_=strlen(buf);
+    str.str_ = new char[str.length_+1]; // выделяем новую память для строки
+
+    for(int i = 0; i < str.length_; i++){
+        str.str_[i] = buf[i];
+    }
+    str.str_[str.length_] = '\0';
     return is;
 }
 
@@ -258,6 +267,7 @@ int String::indexOf(char ch, int start) const {
     return -1;
 }
 
+// Вернуть си представление строки
 const char *String::c_str() const {
     return str_;
 }
@@ -266,16 +276,19 @@ size_t String::length() const {
     return length_;
 }
 
+// поиск слова в строке, можно быстрее, но так проще
 int String::indexOf(const String &other) const {
-    for(int i = 0; i <= length_-other.length_; i++){
+    // перебор позиций
+    for(int i = 0; i <= length_ - other.length_; i++){
         int c = 0;
         for(int j = 0; j < other.length_; j++){
             if(str_[i+j] == other[j])
-                c++;
+                c++; // сколько символов совпадает
         }
-        if(c == other.length_) return i;
+        if(c == other.length_) return i; // если все совпадают
     }
-    return -1;
+
+    return -1; // если не нашли слово
 }
 
 

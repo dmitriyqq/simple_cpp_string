@@ -10,6 +10,10 @@ int main(){
     printf("\n1.\t Concatenation. Let's do simple arithmetics\n");
 
     String two("2");
+
+    two=two; // Ok
+    two = std::move(two); // Ok
+
     String four= two + two;
 
     std::cout<<two<<"+"<<two<<"="<<four<<std::endl;
@@ -35,18 +39,29 @@ int main(){
     std::cout<<"index of \"wear\" in "<<some_string<<" is "<<some_string.indexOf("wear")<<std::endl;
 
     printf("\n6.\t let's do some sorting, and check operator<\n");
+    // Запишем строки в вектор и отсортируем
     std::vector <String> v;
+    v.reserve(10); // Выделит память на 10 элементов
     const char* t[10] = {"ABCD", "ABCDE", "ABCD123", "NADYA", "IS", "thebest", ".", "abc", "123", "1"};
     for(int i = 0; i < 10; i++)
-        v.emplace_back(t[i]);
+        v.emplace_back(t[i]); // Сконструирует стринг прямо в векторе
 
     printf("  \nnormal sort:\n");
-    std::sort(begin(v), end(v), [](const String &a, const String &b){ return a<b;});
+    // stl сортировка
+    std::sort(begin(v), end(v), [](const String &a, const String &b){
+        // Лямбда
+        return a<b;
+    });
     for(auto& e: v) std::cout<<e<<" ";
                     std::cout<<std::endl;
 
     printf("  \nsort by length:\n");
-    std::stable_sort(begin(v), end(v), [](const String &a, const String &b){ return a.length()<b.length();});
+
+    std::stable_sort(begin(v), end(v), [](const String &a, const String &b){
+        // Лямбда
+        return a.length()<b.length();
+    });
+
     for(auto& e: v) std::cout<<e<<" ";
     std::cout<<std::endl;
 
