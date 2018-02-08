@@ -51,15 +51,15 @@ int main(){
     std::cout<<std::endl;
 
     String one("1"), oneone("1");
-    printf("\n7.\t Equality<\n");
+    printf("\n7.\t Equality\n");
     std::cout<<one<<"=="<<two<<" is "<<((one==two) ? "true" : "false")<<std::endl;
     std::cout<<one<<"=="<<oneone<<" is "<<((one==oneone) ? "true" : "false")<<std::endl;
 
-    printf("\n8.\t Inequality<\n");
+    printf("\n8.\t Inequality\n");
     std::cout<<one<<"!="<<two<<" is "<<((one!=two) ? "true" : "false")<<std::endl;
     std::cout<<one<<"!="<<oneone<<" is "<<((one!=oneone) ? "true" : "false")<<std::endl;
 
-    printf("\n9.\t Move semantics<\n");
+    printf("\n9.\t Move semantics\n");
 
     auto swap = [](String& a, String& b){
         // no more copies!
@@ -74,7 +74,29 @@ int main(){
     std::cout<<"swap(one, two)"<<std::endl;
     std::cout<<"one = "<<one<<"two ="<<two<<std::endl;
 
-    printf("\n10.\toperator>> / operator<<\n>>");
+    printf("\n10.\t parseInt(int base)\n");
+    String number("-451"), binary("1011101"), hex("FFA");
+    std::cout<<hex<<" = "<<hex.parseInt(16)<<std::endl;
+    std::cout<<one<<" = "<<one.parseInt(10)<<std::endl;
+    std::cout<<number<<" = "<<number.parseInt(10)<<std::endl;
+    std::cout<<binary<<" = "<<binary.parseInt(2)<<std::endl;
+
+    printf("\n11.\t reverse\n");
+    String alpha("abcdefg");
+    std::cout<<alpha<<" reverse is ";
+    alpha.reverse();
+    std::cout<<alpha<<std::endl;
+
+    printf("\n12.\t reverse\n");
+    std::cout<<alpha<<".fill(1) is ";
+    alpha.fill('1');
+    std::cout<<alpha<<std::endl;
+
+    std::cout<<one<<" = "<<one.parseInt(10)<<std::endl;
+    std::cout<<number<<" = "<<number.parseInt(10)<<std::endl;
+    std::cout<<binary<<" = "<<binary.parseInt(2)<<std::endl;
+
+    printf("\n13.\toperator>> / operator<<\n>>");
 
     String input;
 

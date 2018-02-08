@@ -149,6 +149,55 @@ bool String::operator>(const String &other) const {
 
 }
 
+int String::parseInt(int base) const {
+    int num = 0, sign = 1, s = 0;
+
+    if(str_[0] == '-'){
+        sign = -1;
+        s = 1;
+    }else if(str_[0] == '+'){
+        sign = 1;
+        s = 1;
+    }
+
+    if(base < 2 || base > 32) return -1; // !TODO exceptions
+
+    for(int i = s; (i < length_) && isalnum(str_[i]); i++){
+
+        auto convert = [](char c){
+            c = tolower(c);
+            if(isdigit(c))
+                return c -'0';
+            else if(islower(c)){
+                return (c - 'a' + (char)10);
+            }
+        };
+
+        char d = convert(str_[i]);
+        //printf("%c", d);
+        if(d>=0 && d< base){
+            num*=base;
+            num+=d;
+        }else{
+            return -1;
+        }
+    }
+    return sign*num;
+}
+
+void String::reverse() {
+    int l = 0, r = length_-1;
+    while(l < r){
+        std::swap(str_[l++], str_[r--]);
+    }
+}
+
+void String::fill(char ch) {
+    for(int i = 0; i < length_; i++){
+        str_[i] = ch;
+    }
+}
+
 bool String::operator<(const String &other) const {
     for (int i = 0; i < std::min(this->length_, other.length_); i++){
         if (this->str_[i] > other.str_[i]){

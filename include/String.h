@@ -44,7 +44,14 @@ public:
     // Индекс начиная с start
     int indexOf(char ch, int start) const;
 
+    //Поиск слова в строке
     int indexOf(const String & other) const;
+
+    int parseInt(int base) const;
+
+    void reverse();
+
+    void fill(char ch);
 
     // Вернуть си-строку
     const char* c_str() const;
