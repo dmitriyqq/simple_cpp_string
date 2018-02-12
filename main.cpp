@@ -4,15 +4,15 @@
 #include <algorithm>
 
 int main(){
-
+    try{
     printf("My String class capabilities!\n");
 
     printf("\n1.\t Concatenation. Let's do simple arithmetics\n");
 
     String two("2");
 
-    two=two; // Ok
-    two = std::move(two); // Ok
+  //  two=two; // Ok
+  //   two = std::move(two); // Not Ok
 
     String four= two + two;
 
@@ -39,38 +39,41 @@ int main(){
     std::cout<<"index of \"wear\" in "<<some_string<<" is "<<some_string.indexOf("wear")<<std::endl;
 
     printf("\n6.\t let's do some sorting, and check operator<\n");
-    // Запишем строки в вектор и отсортируем
-    std::vector <String> v;
-    v.reserve(10); // Выделит память на 10 элементов
-    const char* t[10] = {"ABCD", "ABCDE", "ABCD123", "NADYA", "IS", "thebest", ".", "abc", "123", "1"};
-    for(int i = 0; i < 10; i++)
-        v.emplace_back(t[i]); // Сконструирует стринг прямо в векторе
+
+
+    String t[10] = {"ABCD", "ABCDE", "ABCD123", "NADYA", "IS", "thebest", ".", "abc", "123", "1"};
 
     printf("  \nnormal sort:\n");
     // stl сортировка
-    std::sort(begin(v), end(v), [](const String &a, const String &b){
-        // Лямбда
+    std::sort(t, t+10, [](const String &a, const String &b){
         return a<b;
     });
-    for(auto& e: v) std::cout<<e<<" ";
-                    std::cout<<std::endl;
+
+    for(int i = 0; i < 10; i++)
+        std::cout<<t[i]<<" ";
+    std::cout<<std::endl;
 
     printf("  \nsort by length:\n");
 
-    std::stable_sort(begin(v), end(v), [](const String &a, const String &b){
-        // Лямбда
+    std::stable_sort(t, t+10, [](const String &a, const String &b){
         return a.length()<b.length();
     });
 
-    for(auto& e: v) std::cout<<e<<" ";
+    for(int i = 0; i < 10; i++)
+        std::cout<<t[i]<<" ";
     std::cout<<std::endl;
 
     String one("1"), oneone("1");
-    printf("\n7.\t Equality\n");
+    printf("\n7.\t Comparisons\n");
     std::cout<<one<<"=="<<two<<" is "<<((one==two) ? "true" : "false")<<std::endl;
     std::cout<<one<<"=="<<oneone<<" is "<<((one==oneone) ? "true" : "false")<<std::endl;
-
-    printf("\n8.\t Inequality\n");
+    std::cout<<one<<"<"<<one<<" is "<<((one<one) ? "true" : "false")<<std::endl;
+    std::cout<<one<<"<"<<two<<" is "<<((one<two) ? "true" : "false")<<std::endl;
+    std::cout<<one<<">"<<oneone<<" is "<<((one>oneone) ? "true" : "false")<<std::endl;
+    std::cout<<one<<">"<<two<<" is "<<((one > two) ? "true" : "false")<<std::endl;
+    std::cout<<one<<">="<<two<<" is "<<((one >= two) ? "true" : "false")<<std::endl;
+    std::cout<<one<<"<="<<two<<" is "<<((one <= two) ? "true" : "false")<<std::endl;
+    std::cout<<one<<">="<<oneone<<" is "<<((one >= oneone) ? "true" : "false")<<std::endl;
     std::cout<<one<<"!="<<two<<" is "<<((one!=two) ? "true" : "false")<<std::endl;
     std::cout<<one<<"!="<<oneone<<" is "<<((one!=oneone) ? "true" : "false")<<std::endl;
 
@@ -90,11 +93,21 @@ int main(){
     std::cout<<"one = "<<one<<"two ="<<two<<std::endl;
 
     printf("\n10.\t parseInt(int base)\n");
-    String number("-451"), binary("1011101"), hex("FFA");
-    std::cout<<hex<<" = "<<hex.parseInt(16)<<std::endl;
-    std::cout<<one<<" = "<<one.parseInt(10)<<std::endl;
-    std::cout<<number<<" = "<<number.parseInt(10)<<std::endl;
-    std::cout<<binary<<" = "<<binary.parseInt(2)<<std::endl;
+    String number("-451  "), binary("1011101"), hex("FFA");
+    std::cout<<hex<<"(16) = "<<hex.parseInt(16)<<std::endl;
+    std::cout<<one<<"(10) = "<<one.parseInt(10)<<std::endl;
+    std::cout<<number<<"(10) = "<<number.parseInt(10)<<std::endl;
+    std::cout<<binary<<"(2) = "<<binary.parseInt(2)<<std::endl;
+    std::cout<<one<<"(10) = "<<one.parseInt(10)<<std::endl;
+    std::cout<<number<<"(10) = "<<number.parseInt(10)<<std::endl;
+    std::cout<<binary<<"(2) = "<<binary.parseInt(2)<<std::endl;
+    std::cout<<String("  222")<<"(3) = "<<String("  222").parseInt(3)<<std::endl;
+    std::cout<<String("   -222")<<"(4) = "<<String("   -222").parseInt(4)<<std::endl;
+    std::cout<<String("   1")<<"(5) = "<<String("   1").parseInt(5)<<std::endl;
+//    std::cout<<String("  ")<<"(5) = "<<String("  ").parseInt(5)<<std::endl; Error
+//    std::cout<<String(" - ")<<"(5) = "<<String(" - ").parseInt(5)<<std::endl; Error
+    std::cout<<String(" 7   ")<<"(16) = "<<String(" 7   ").parseInt(16)<<std::endl;
+//    std::cout<<String("gg ")<<"(16) = "<<String("gg ").parseInt(16)<<std::endl; Error
 
     printf("\n11.\t reverse\n");
     String alpha("abcdefg");
@@ -106,19 +119,17 @@ int main(){
     std::cout<<alpha<<".fill(1) is ";
     alpha.fill('1');
     std::cout<<alpha<<std::endl;
-
-    std::cout<<one<<" = "<<one.parseInt(10)<<std::endl;
-    std::cout<<number<<" = "<<number.parseInt(10)<<std::endl;
-    std::cout<<binary<<" = "<<binary.parseInt(2)<<std::endl;
+    alpha = "abcdefg";
 
     printf("\n13.\toperator>> / operator<<\n>>");
-
     String input;
 
     std::cin>>input;
     std::cout<<input<<std::endl;
     //String result;
     //result = str + str2;
-
+    } catch(std::runtime_error e){
+        std::cout<<std::endl<<e.what()<<std::endl;
+    }
     return 0;
 }

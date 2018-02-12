@@ -17,14 +17,22 @@ class String
 
 protected:
     //указатель на массив char, хранит символы, которые мы передали в наш объект
-    char *str_;
+    char *str_ = nullptr;
 
-    size_t length_;
+    size_t length_ = 0;
+
+    int compare(const String& other) const;
 
 public:
 
-    //конструктор без параметров
-    String();
+    // Конструктор без параметров
+    String() = default;
+
+    // Конструктор с резервированием памяти
+    explicit String(size_t size);
+
+    // Конструктор с заполнением
+    String(size_t size, char ch);
 
     // Конструктор с параметрами, при создании объекта класса необходимо перелать строку которую он будет хранить
     String(const char *str);
@@ -47,11 +55,14 @@ public:
     //Поиск слова в строке
     int indexOf(const String & other) const;
 
-    int parseInt(int base) const;
+    int parseInt(unsigned int base) const;
 
     void reverse();
 
     void fill(char ch);
+
+    // выделяет память
+    void reserve(size_t ch);
 
     // Вернуть си-строку
     const char* c_str() const;
@@ -74,6 +85,10 @@ public:
     bool operator!=(const String& other) const;
 
     bool operator>(const String& other) const;
+
+    bool operator>=(const String& other) const;
+
+    bool operator<=(const String& other) const;
 
     bool operator<(const String& other) const;
 

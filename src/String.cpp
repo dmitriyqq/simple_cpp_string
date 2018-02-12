@@ -6,20 +6,22 @@
 
 #include "String.h"
 
-String::String() :
-    str_(nullptr),
-    length_(0)
+
+
+String::String(size_t size)
 {
+    reserve(size);
+}
+
+String::String(size_t size, char ch){
+    reserve(size);
+    fill(ch);
 }
 
 String::String(const char *str){
 
-
-    length_ = strlen(str); // Функция strlen получает количество символов в строке которую мы передаём в объект
-
-    // выделяем память для динамического массива, где будет храниться наша строка
-    // +1 символ так как нужно место в массиве под терминирующий 0
-    this->str_ = new char[length_ + 1];
+    // Функция strlen получает количество символов в строке которую мы передаём в объект
+    reserve(strlen(str));
 
     // копируем символы строки в массив нашего класса
     for (int i = 0; i < length_; i++)
@@ -27,9 +29,6 @@ String::String(const char *str){
         this->str_[i] = str[i];
     }
 
-    // закрываем строку терминирующим нулём, т.к. у нас есть c_str() нужно поддерживать валидную си строку
-    // иначе 0 на конце не нужен, у нас и так есть поле length_
-    this->str_[length_] = '\0';
 }
 
 String::~String(){
@@ -37,9 +36,9 @@ String::~String(){
 }
 
 String::String(String&& other):
-    length_(other.length_),
-    str_(other.str_)
+        length_(other.length_)
 {
+    str_ = other.str_;
 
     other.str_ = nullptr;
     other.length_ = 0;
@@ -49,38 +48,66 @@ String::String(String&& other):
 String::String(const String &other){
 
     length_ = strlen(other.str_);
-    this->str_ = new char[length_ + 1];
+    reserve(length_ + 1);
 
     for (int i = 0; i < length_; i++){
         this->str_[i] = other.str_[i];
     }
 
-    this->str_[length_] = '\0';
 }
 
 String& String::operator= (const String &other){
     // здесь логика похожа на ту которая реализована в конструкторе, за исключением того, что нам нужно позаботиться
     // об освобождении ресурсов объекта если до копирования в него новой строки он уже содержал код
     // + страндартный синтаксис перегрузки оператора =
-    if(*this != other) { // Если присвоили самому себе, то ничего копировать не нужно
-        delete[] str_;
 
-        length_ = strlen(other.str_);
-        this->str_ = new char[length_ + 1];
 
-        for (int i = 0; i < length_; i++) {
-            this->str_[i] = other.str_[i];
-        }
-
-        this->str_[length_] = '\0';
-
+    if(*this == other) // Если присвоили самому себе, то ничего копировать не нужно
         return *this;
+
+    delete[] str_;
+
+    length_ = strlen(other.str_);
+    reserve(length_ + 1);
+
+    for (int i = 0; i < length_; i++) {
+        this->str_[i] = other.str_[i];
     }
+
+
+    return *this;
+
+}
+
+void String::reserve(size_t size) {
+    // Удаляем прошлую запись
+    delete[] this->str_;
+
+    this->length_ = size;
+
+    // выделяем память для динамического массива, где будет храниться наша строка
+    // +1 символ так как нужно место в массиве под терминирующий 0
+    this->str_ = new char[size+1];
+
+    if(this->str_ == nullptr){
+        throw std::runtime_error("Unable to allocate memory");
+    }
+
+    // закрываем строку терминирующим нулём, т.к. у нас есть c_str() нужно поддерживать валидную си строку
+    // иначе 0 на конце не нужен, у нас и так есть поле length_
+    this->str_[size] = '\0';
+
 }
 
 String& String::operator=(String&& p){
-    std::swap(str_, p.str_);
-    std::swap(length_, p.length_);
+    delete[] str_;
+
+    str_ = p.str_;
+    length_ = p.length_;
+
+    p.length_ = 0;
+    p.str_ = nullptr;
+
     return *this;
 }
 
@@ -89,59 +116,83 @@ String String::operator+(const String &other)
     //создаём новый пустой объект где будим хранить результат конкатенации строк и который будет результатом работы
     // перегруженного оператора +
     String new_str;
-    // получаем количество символов в обеих строках для конкатенации
 
-    size_t this_length = strlen(this->str_);
-    size_t other_length = strlen(other.str_);
-
-    new_str.length_ = this_length + other_length;
-
-    // выделяем место в динамической памяти под новую строку
-    new_str.str_ = new char[this_length + other_length + 1];
+    new_str.reserve(this->length_ + other.length_);
 
     //копируем данные из 2х конкатенируемых строк в новую строку
     int i = 0;
-    for (; i < this_length; i++)
-    {
-    new_str.str_[i] = this->str_[i];
+
+    for (; i < this->length_; i++){
+        new_str.str_[i] = this->str_[i];
     }
 
-    for (int j = 0; j < other_length; j++, i++)
-    {
-    new_str.str_[i] = other.str_[j];
+    for (int j = 0; j < other.length_; j++, i++){
+        new_str.str_[i] = other.str_[j];
     }
-
-    new_str.str_[this_length + other_length] = '\0';
 
     // возвращаем результат конкатенации
     return new_str;
 }
 
+int String::compare(const String &other) const{
+    // 1 если меньше, 0 если равны, -1 если больше
+    for (int i = 0; i < std::min(this->length_, other.length_); i++){
+        if (this->str_[i] < other.str_[i])
+            return  1;
+        else if(this->str_[i] > other.str_[i])
+            return -1;
 
-bool String::operator==(const String & other) const {
-    if (this->length_ != other.length_)
-    {
-        return false;
     }
 
-    for (int i = 0; i < this->length_; i++){
-        if (this->str_[i] != other.str_[i]){
-            return false;
-        }
-    }
+    if (this->length_ == other.length_)
+        return 0;
+    else if(this->length_ < other.length_)
+        return 1;
+    else
+        return -1;
 
-    return true;
+
+}
+
+// Лексикографическое сравнение (по символам)
+bool String::operator<(const String &other) const {
+    int cmp = compare(other);
+    return  cmp == 1;
+}
+
+bool String::operator>(const String &other) const {
+    int cmp = compare(other);
+    return  cmp == -1;
+}
+
+bool String::operator>=(const String &other) const {
+    int cmp = compare(other);
+    return  (!cmp) || (cmp == -1);
+}
+
+bool String::operator<=(const String &other) const {
+    int cmp = compare(other);
+    return  (!cmp) || (cmp ==  1);
+}
+
+
+bool String::operator==(const String & other) const{
+    return !compare(other);
 }
 
 bool String::operator!=(const String & other) const {
-    return !(this->operator==(other));
+    return compare(other);
 }
 
 // попытаться извлеч число в системе счисления base из строки
-int String::parseInt(int base) const {
-    int num = 0, sign = 1, s = 0;
+int String::parseInt(unsigned int base) const {
+    // Проверка основания
+    if(base < 2 || base > 36) throw std::runtime_error("Invalid base");
 
-    for(;s<length_ && isspace(s);s++); // Игнор пробелов в начале
+    int num = 0, sign = 0, s = 0;
+
+    for(;s<length_ && isspace(str_[s]);s++); // Игнор пробелов в начале
+    if(s == length_) throw std::runtime_error("Couldn't parse int from string");
 
     // Обработка знака
     if(str_[s] == '-'){
@@ -151,12 +202,10 @@ int String::parseInt(int base) const {
         sign = 1;
         s++;
     }
-    // Проверка основания
-    if(base < 2 || base > 32) throw std::range_error("Invalid base."); // !TODO exceptions
 
     // Пытаемся считать число в НАЧАЛЕ строки
     for(int i = s; (i < length_) && isalnum(str_[i]); i++){
-        char d, c = str_[i];
+        char d, c = tolower(str_[i]);
         if(isdigit(c))
             d = c -'0'; // Встретилась цифра
         else if(islower(c)){
@@ -167,11 +216,18 @@ int String::parseInt(int base) const {
             num*=base;
             num+=d;
         }else{
-            break; // Встетилась цифра/буква, которой нет в системе счисления с основанием base
+             // Встетилась цифра/буква, которой нет в системе счисления с основанием base
+            throw std::runtime_error("Couldn't parse int from string. Unexpected digit out of base range");
         }
     }
+    if(!sign){
+        return num;
+    }else if(num!= 0){
+        return sign*num;
+    }else{
+        throw std::runtime_error("Sign should be followed by at least one digit");
+    }
 
-    return sign*num;
 }
 
 // Инверсия строки, возможно лучше чтобы возвращалась инвертированая копия, но зато этот метод не требует доп. памяти
@@ -189,29 +245,6 @@ void String::fill(char ch) {
     }
 }
 
-// Лексикографическое сравнение (по символам)
-bool String::operator>(const String &other) const {
-
-    for (int i = 0; i < std::min(this->length_, other.length_); i++){
-        if (this->str_[i] < other.str_[i]){
-            return false;
-        }
-    }
-
-    return this->length_ > other.length_;
-}
-
-bool String::operator<(const String &other) const {
-    for (int i = 0; i < std::min(this->length_, other.length_); i++){
-        if (this->str_[i] > other.str_[i]){
-            return false;
-        }
-    }
-
-    return this->length_ < other.length_;
-}
-
-
 char& String::operator[](int index)
 {
     return this->str_[index];
@@ -222,19 +255,20 @@ char String::operator[](int index) const{
 }
 
 std::istream& operator>>(std::istream &is, String &str) {
-    delete str.str_; // удаляем то что было
+    delete[] str.str_; // удаляем то что было
     constexpr size_t kMaxSize = 5000;
 
-    char buf[kMaxSize]; // буфер на стеке в котором будет введенная строка, благо istream умеет вводить си строки
-    is>>buf;
+    String tmp(kMaxSize); // буфер на стеке в котором будет введенная строка, благо istream умеет вводить си строки
+    is>>tmp.str_;
 
-    str.length_=strlen(buf);
-    str.str_ = new char[str.length_+1]; // выделяем новую память для строки
+    size_t length = strlen(tmp.str_);
+
+    str.reserve(length); // выделяем новую память для строки
 
     for(int i = 0; i < str.length_; i++){
-        str.str_[i] = buf[i];
+        str.str_[i] = tmp[i];
     }
-    str.str_[str.length_] = '\0';
+
     return is;
 }
 
@@ -280,12 +314,12 @@ size_t String::length() const {
 int String::indexOf(const String &other) const {
     // перебор позиций
     for(int i = 0; i <= length_ - other.length_; i++){
-        int c = 0;
+        int count_match = 0;
         for(int j = 0; j < other.length_; j++){
             if(str_[i+j] == other[j])
-                c++; // сколько символов совпадает
+                count_match++; // сколько символов совпадает
         }
-        if(c == other.length_) return i; // если все совпадают
+        if(count_match == other.length_) return i; // если все совпадают
     }
 
     return -1; // если не нашли слово
