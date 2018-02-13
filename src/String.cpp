@@ -62,13 +62,13 @@ String& String::operator= (const String &other){
     // + страндартный синтаксис перегрузки оператора =
 
 
-    if(*this == other) // Если присвоили самому себе, то ничего копировать не нужно
+    if(str_ == other.str_) // Если присвоили самому себе, то ничего копировать не нужно
         return *this;
 
     delete[] str_;
 
     length_ = strlen(other.str_);
-    reserve(length_ + 1);
+    reserve(length_);
 
     for (int i = 0; i < length_; i++) {
         this->str_[i] = other.str_[i];
@@ -100,6 +100,10 @@ void String::reserve(size_t size) {
 }
 
 String& String::operator=(String&& p){
+    // Если присвоили самому себе
+    if(str_ == p.str_)
+        return *this;
+
     delete[] str_;
 
     str_ = p.str_;
@@ -156,13 +160,11 @@ int String::compare(const String &other) const{
 
 // Лексикографическое сравнение (по символам)
 bool String::operator<(const String &other) const {
-    int cmp = compare(other);
-    return  cmp == 1;
+    return  compare(other) == 1;
 }
 
 bool String::operator>(const String &other) const {
-    int cmp = compare(other);
-    return  cmp == -1;
+    return  compare(other) == -1;
 }
 
 bool String::operator>=(const String &other) const {
@@ -181,7 +183,7 @@ bool String::operator==(const String & other) const{
 }
 
 bool String::operator!=(const String & other) const {
-    return compare(other);
+    return (bool)compare(other);
 }
 
 // попытаться извлеч число в системе счисления base из строки
@@ -205,7 +207,7 @@ int String::parseInt(unsigned int base) const {
 
     // Пытаемся считать число в НАЧАЛЕ строки
     for(int i = s; (i < length_) && isalnum(str_[i]); i++){
-        char d, c = tolower(str_[i]);
+        char d = -1, c = tolower(str_[i]);
         if(isdigit(c))
             d = c -'0'; // Встретилась цифра
         else if(islower(c)){
@@ -213,16 +215,17 @@ int String::parseInt(unsigned int base) const {
         }
 
         if(d>=0 && d< base){
-            num*=base;
-            num+=d;
+            num *= base;
+            num += d;
         }else{
              // Встетилась цифра/буква, которой нет в системе счисления с основанием base
             throw std::runtime_error("Couldn't parse int from string. Unexpected digit out of base range");
         }
     }
+
     if(!sign){
         return num;
-    }else if(num!= 0){
+    }else if(num){
         return sign*num;
     }else{
         throw std::runtime_error("Sign should be followed by at least one digit");
@@ -232,7 +235,7 @@ int String::parseInt(unsigned int base) const {
 
 // Инверсия строки, возможно лучше чтобы возвращалась инвертированая копия, но зато этот метод не требует доп. памяти
 void String::reverse() {
-    int l = 0, r = length_-1;
+    size_t l = 0, r = length_-1;
     while(l < r){
         std::swap(str_[l++], str_[r--]);
     }
@@ -285,7 +288,7 @@ std::ostream& operator<<(std::ostream &os, const String &str){
 int String::firstIndexOf(char ch) const {
     for(size_t i = 0; i < length_; i++){
         if(str_[i] == ch)
-            return i;
+            return (int)i;
     }
 
     return -1;
@@ -295,7 +298,7 @@ int String::indexOf(char ch, int start) const {
     if(start < length_)
         for(size_t i = start; i < length_; i++){
             if(str_[i] == ch)
-                return i;
+                return (int)i;
         }
 
     return -1;
