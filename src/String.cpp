@@ -1,8 +1,6 @@
 //
 // Created by dima on 07.02.18.
 //
-#include <cstring> // only for strlen
-#include <algorithm> // only for swap
 
 #include "String.h"
 
@@ -19,24 +17,15 @@ String::String(size_t size, char ch){
 }
 
 String::String(const char *str){
-
-    // Функция strlen получает количество символов в строке которую мы передаём в объект
-    reserve(strlen(str));
-
-    // копируем символы строки в массив нашего класса
-    for (int i = 0; i < length_; i++)
-    {
-        this->str_[i] = str[i];
-    }
-
+    assign(str);
 }
 
-String::~String(){
-    delete[] this->str_;
+String::String(const String &other){
+    assign(other.str_);
 }
 
 String::String(String&& other):
-        length_(other.length_)
+    length_(other.length_)
 {
     str_ = other.str_;
 
@@ -45,38 +34,24 @@ String::String(String&& other):
 }
 
 
-String::String(const String &other){
-
-    length_ = strlen(other.str_);
-    reserve(length_ + 1);
-
-    for (int i = 0; i < length_; i++){
-        this->str_[i] = other.str_[i];
-    }
-
+String::~String(){
+    delete[] this->str_;
 }
 
 String& String::operator= (const String &other){
-    // здесь логика похожа на ту которая реализована в конструкторе, за исключением того, что нам нужно позаботиться
-    // об освобождении ресурсов объекта если до копирования в него новой строки он уже содержал код
-    // + страндартный синтаксис перегрузки оператора =
 
-
-    if(str_ == other.str_) // Если присвоили самому себе, то ничего копировать не нужно
-        return *this;
-
-    delete[] str_;
-
-    length_ = strlen(other.str_);
-    reserve(length_);
-
-    for (int i = 0; i < length_; i++) {
-        this->str_[i] = other.str_[i];
+    if(str_ != other.str_){ // Если присвоили самому себе, то ничего копировать не нужно
+        assign(other.str_);
     }
 
-
     return *this;
+}
 
+size_t String::strlen(const char *str) {
+    size_t length = 0;
+    if(str != nullptr)
+        for(; str[length] != '\0'; length++);
+    return length;
 }
 
 void String::reserve(size_t size) {
@@ -84,7 +59,6 @@ void String::reserve(size_t size) {
     delete[] this->str_;
 
     this->length_ = size;
-
     // выделяем память для динамического массива, где будет храниться наша строка
     // +1 символ так как нужно место в массиве под терминирующий 0
     this->str_ = new char[size+1];
@@ -97,6 +71,18 @@ void String::reserve(size_t size) {
     // иначе 0 на конце не нужен, у нас и так есть поле length_
     this->str_[size] = '\0';
 
+}
+
+void String::assign(const char *str) {
+
+    delete[] str_;
+
+    length_ = strlen(str);
+    reserve(length_);
+
+    for (int i = 0; i < length_; i++) {
+        this->str_[i] = str[i];
+    }
 }
 
 String& String::operator=(String&& p){
@@ -172,11 +158,11 @@ bool String::operator>=(const String &other) const {
     return  (!cmp) || (cmp == -1);
 }
 
+
 bool String::operator<=(const String &other) const {
     int cmp = compare(other);
     return  (!cmp) || (cmp ==  1);
 }
-
 
 bool String::operator==(const String & other) const{
     return !compare(other);
@@ -237,7 +223,7 @@ int String::parseInt(unsigned int base) const {
 void String::reverse() {
     size_t l = 0, r = length_-1;
     while(l < r){
-        std::swap(str_[l++], str_[r--]);
+        swap(str_[l++], str_[r--]);
     }
 }
 
@@ -258,13 +244,13 @@ char String::operator[](int index) const{
 }
 
 std::istream& operator>>(std::istream &is, String &str) {
-    delete[] str.str_; // удаляем то что было
+    delete[] str.str_; // удаляем то что былоHel
     constexpr size_t kMaxSize = 5000;
 
     String tmp(kMaxSize); // буфер на стеке в котором будет введенная строка, благо istream умеет вводить си строки
     is>>tmp.str_;
 
-    size_t length = strlen(tmp.str_);
+    size_t length = String::strlen(tmp.str_);
 
     str.reserve(length); // выделяем новую память для строки
 
@@ -275,6 +261,7 @@ std::istream& operator>>(std::istream &is, String &str) {
     return is;
 }
 
+
 std::ostream& operator<<(std::ostream &os, const String &str){
     os<<'\"';
     for(int i = 0; i < str.length_; i++){
@@ -283,7 +270,6 @@ std::ostream& operator<<(std::ostream &os, const String &str){
     os<<'\"';
     return os;
 }
-
 
 int String::firstIndexOf(char ch) const {
     for(size_t i = 0; i < length_; i++){
@@ -327,5 +313,7 @@ int String::indexOf(const String &other) const {
 
     return -1; // если не нашли слово
 }
+
+void String::swap(char &a, char &b) { char t = a; a = b; b = t; }
 
 

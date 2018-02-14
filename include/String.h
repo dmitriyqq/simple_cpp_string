@@ -23,6 +23,11 @@ protected:
 
     int compare(const String& other) const;
 
+    static size_t strlen(const char* str);
+
+    static void swap(char &a, char &b);
+
+
 public:
 
     // Конструктор без параметров
@@ -55,14 +60,20 @@ public:
     //Поиск слова в строке
     int indexOf(const String & other) const;
 
+    // Преобразование числа в строку
     int parseInt(unsigned int base) const;
 
+    // Преобразование
     void reverse();
 
+    // Заполнить строку
     void fill(char ch);
 
-    // выделяет память
+    // Выделяет память
     void reserve(size_t ch);
+
+    //
+    void assign(const char * str);
 
     // Вернуть си-строку
     const char* c_str() const;
@@ -97,7 +108,7 @@ public:
 
     char& operator[](int index);
 
-    // выводит строку в консоль, в идеале для этого необходима перегрузка оператора «
+    // Выводит строку в консоль, в идеале для этого необходима перегрузка оператора «
     // нах*й принт даешь потоки
     friend std::istream& operator>>(std::istream& is, String& str);
 

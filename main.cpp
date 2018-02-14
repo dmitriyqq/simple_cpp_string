@@ -2,6 +2,7 @@
 #include <vector>
 #include <String.h>
 #include <algorithm>
+#include <memory>
 
 int main(){
     try{
@@ -11,8 +12,9 @@ int main(){
 
     String two("2");
 
-  //  two=two; // Ok
-  //   two = std::move(two); // Not Ok
+    // Ничего не произойдет
+    two=two; // Ok
+    two = std::move(two); // Ok
 
     String four= two + two;
 
@@ -115,13 +117,39 @@ int main(){
     alpha.reverse();
     std::cout<<alpha<<std::endl;
 
-    printf("\n12.\t reverse\n");
+    printf("\n12.\t fill\n");
     std::cout<<alpha<<".fill(1) is ";
     alpha.fill('1');
     std::cout<<alpha<<std::endl;
-    alpha = "abcdefg";
 
-    printf("\n13.\toperator>> / operator<<\n>>");
+
+    printf("\n13.\toperator []<<\n");
+    String str = "string";
+    str[0] = 'S';
+    std::cout<<str<<std::endl;
+
+
+    // Check memory leak
+    // Char constructor
+    String *die = new String("die");
+    // Reserve constructor
+    String *str3 = new String(153);
+    // Default constructor
+    String *kek2 = new String();
+    // Copy constructor
+    String *kek1 = new String(str);
+
+    delete die;
+    delete str3;
+    delete kek1;
+    delete kek2;
+
+    printf("\n14.\tdelete nullptr and NULL has no effect\n");
+    String *nul = new String();
+    nul->assign(nullptr);
+    delete nul;
+
+    printf("\n15.\toperator>> / operator<<\n>>");
     String input;
 
     std::cin>>input;
