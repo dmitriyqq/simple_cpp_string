@@ -104,9 +104,9 @@ public:
     bool operator<(const String& other) const;
 
     // Операторы произвольного доступа
-    char operator[](int index) const;
+    char operator[](size_t index) const;
 
-    char& operator[](int index);
+    char& operator[](size_t index);
 
     // Выводит строку в консоль, в идеале для этого необходима перегрузка оператора «
     // нах*й принт даешь потоки

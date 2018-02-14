@@ -234,13 +234,19 @@ void String::fill(char ch) {
     }
 }
 
-char& String::operator[](int index)
+char& String::operator[](size_t index)
 {
-    return this->str_[index];
+    if(index < length_ )
+        return this->str_[index];
+    else
+        throw std::runtime_error("String index out of range");
 }
 
-char String::operator[](int index) const{
-    return this->str_[index];
+char String::operator[](size_t index) const{
+    if(index < length_ )
+        return this->str_[index];
+    else
+        throw std::runtime_error("String index out of range");
 }
 
 std::istream& operator>>(std::istream &is, String &str) {
