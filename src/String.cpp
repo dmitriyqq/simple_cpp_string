@@ -3,7 +3,7 @@
 //
 
 #include "String.h"
-
+#include "Exception.h"
 
 
 String::String(size_t size)
@@ -64,7 +64,7 @@ void String::reserve(size_t size) {
     this->str_ = new char[size+1];
 
     if(this->str_ == nullptr){
-        throw std::runtime_error("Unable to allocate memory");
+        throw MemoryException();
     }
 
     // закрываем строку терминирующим нулём, т.к. у нас есть c_str() нужно поддерживать валидную си строку
@@ -175,12 +175,12 @@ bool String::operator!=(const String & other) const {
 // попытаться извлеч число в системе счисления base из строки
 int String::parseInt(unsigned int base) const {
     // Проверка основания
-    if(base < 2 || base > 36) throw std::runtime_error("Invalid base");
+    if(base < 2 || base > 36) throw LogicException();
 
     int num = 0, sign = 0, s = 0;
 
     for(;s<length_ && isspace(str_[s]);s++); // Игнор пробелов в начале
-    if(s == length_) throw std::runtime_error("Couldn't parse int from string");
+    if(s == length_) throw RuntimeException("Couldn't parse int from string");
 
     // Обработка знака
     if(str_[s] == '-'){
@@ -205,7 +205,7 @@ int String::parseInt(unsigned int base) const {
             num += d;
         }else{
              // Встетилась цифра/буква, которой нет в системе счисления с основанием base
-            throw std::runtime_error("Couldn't parse int from string. Unexpected digit out of base range");
+            throw RuntimeException("Couldn't parse int from string. Unexpected digit out of base range");
         }
     }
 
@@ -214,7 +214,7 @@ int String::parseInt(unsigned int base) const {
     }else if(num){
         return sign*num;
     }else{
-        throw std::runtime_error("Sign should be followed by at least one digit");
+        throw RuntimeException("Sign should be followed by at least one digit");
     }
 
 }
@@ -239,14 +239,14 @@ char& String::operator[](size_t index)
     if(index < length_ )
         return this->str_[index];
     else
-        throw std::runtime_error("String index out of range");
+        throw OutOfRangeException();
 }
 
 char String::operator[](size_t index) const{
     if(index < length_ )
         return this->str_[index];
     else
-        throw std::runtime_error("String index out of range");
+        throw OutOfRangeException();
 }
 
 std::istream& operator>>(std::istream &is, String &str) {

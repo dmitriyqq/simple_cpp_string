@@ -3,7 +3,7 @@
 #include <String.h>
 #include <algorithm>
 #include <memory>
-
+#include <Exception.h>
 int main(){
     try{
     printf("My String class capabilities!\n");
@@ -156,7 +156,7 @@ int main(){
     std::cout<<input<<std::endl;
     //String result;
     //result = str + str2;
-    } catch(std::runtime_error e){
+    } catch(Exception& e){
         std::cout<<std::endl<<e.what()<<std::endl;
     }
     return 0;
