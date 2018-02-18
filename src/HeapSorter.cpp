@@ -1,10 +1,8 @@
 //
 // Created by dima on 07.02.18.
 //
-
-#include "Sorter.h"
-
-void HeapSorter::sort(int* a, size_t size) {
+template <typename T>
+void HeapSorter<T>::sort(T* a, size_t size) {
     buildHeap(a, size);
     while(size > 1){
         size--;
@@ -12,8 +10,8 @@ void HeapSorter::sort(int* a, size_t size) {
         heapify(a, size, 0);
     }
 }
-
-void HeapSorter::heapify(int *a, int size, int i){
+template <typename T>
+void HeapSorter<T>::heapify(T* a, int size, int i){
     int l = 2*i+1;
     int r = 2*i+2;
     int mi;
@@ -35,8 +33,8 @@ void HeapSorter::heapify(int *a, int size, int i){
         heapify(a, size, mi);
     }
 }
-
-void HeapSorter::buildHeap(int* a, int size){
+template <typename T>
+void HeapSorter<T>::buildHeap(T* a, int size){
     for(int i = size/2-1; i >=0; i--){
         heapify(a,size,i);
     }

@@ -2,50 +2,60 @@
 // Created by dima on 18.02.18.
 //
 
+#include <algorithm>
+
 #ifndef STRING_CLASS_CPP_SORTER_H
 #define STRING_CLASS_CPP_SORTER_H
-#include <vector>
 
-using std::vector;
-
+template <typename T>
 class Sorter {
-
 public:
-    virtual void sort(int* a, size_t size) = 0;
+    virtual void sort(T* a, size_t size) = 0;
 };
 
-class MergeSorter : public Sorter{
-    static void merge_sort(int * array, size_t size);
-    static int* merge(int *a, size_t size_a, int *b, size_t size_b);
+template <typename T>
+class MergeSorter : public Sorter<T>{
+    static void merge_sort(T * array, size_t size);
+    static T* merge(T *a, size_t size_a, T *b, size_t size_b);
 public:
-    void sort(int* a, size_t size) override;
+    void sort(T* a, size_t size) override;
 };
+#include "MergeSorter.cpp"
 
-class HeapSorter : public Sorter{
-    static void heapify(int *a, int size, int i);
-    static void buildHeap(int *a, int size);
+
+template <typename T>
+class HeapSorter : public Sorter<T>{
+    static void heapify(T *a, int size, int i);
+    static void buildHeap(T *a, int size);
 public:
-    void sort(int* a, size_t size) override;
+    void sort(T* a, size_t size) override;
 };
+#include "HeapSorter.cpp"
 
 
-class BubbleSorter : public Sorter{
+template <typename T>
+class BubbleSorter : public Sorter<T>{
 public:
-    void sort(int* a, size_t size) override;
+    void sort(T* a, size_t size) override;
 };
+#include "BubbleSorter.cpp"
 
-class InsertionSorter : public Sorter{
-    static int binary_search(int* a, size_t size, int value);
+
+template <typename T>
+class InsertionSorter : public Sorter<T>{
+    static int binary_search(T* a, size_t size, T value);
 public:
-    void sort(int* a, size_t size) override;
+    void sort(T* a, size_t size) override;
 };
+#include "InsertionSorter.cpp"
 
-class SelectionSorter : public Sorter{
+
+template <typename T>
+class SelectionSorter : public Sorter<T>{
 public:
-    void sort(int* a, size_t sizev) override;
+    void sort(T* a, size_t sizev) override;
 };
-
-
+#include "SelectionSorter.cpp"
 
 
 #endif //STRING_CLASS_CPP_SORTER_H

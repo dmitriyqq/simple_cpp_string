@@ -1,10 +1,8 @@
 //
 // Created by dima on 18.02.18.
 //
-
-#include "Sorter.h"
-
-void SelectionSorter::sort(int* a, size_t size) {
+template <typename T>
+void SelectionSorter<T>::sort(T* a, size_t size) {
     for(int i = 0; i < size; i++){
         int m = i;
         for(int j = i+1; j < size; j++){
@@ -12,8 +10,6 @@ void SelectionSorter::sort(int* a, size_t size) {
                 m = j;
             }
         }
-        int t = a[i];
-        a[i] = a[m];
-        a[m] = t;
+        std::swap(a[i],a[m]);
     }
 }

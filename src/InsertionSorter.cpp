@@ -1,12 +1,10 @@
 //
 // Created by dima on 18.02.18.
 //
-
-#include "Sorter.h"
-
-void InsertionSorter::sort(int* a, size_t size) {
+template <typename T>
+void InsertionSorter<T>::sort(T* a, size_t size) {
     for(int k = 1; k < size; k++){
-        int c = a[k];
+        T c = a[k];
         int i = binary_search(a, k, c);
         for(int j = k; j > i; j--){
             a[j] = a[j-1];
@@ -14,8 +12,8 @@ void InsertionSorter::sort(int* a, size_t size) {
         a[i] = c;
     }
 }
-
-int InsertionSorter::binary_search(int* a, size_t size, int value) {
+template <typename T>
+int InsertionSorter<T>::binary_search(T* a, size_t size, T value) {
     int l = 0, r = size, m;
     while(r-l > 1){
         m = (r+l)/2;

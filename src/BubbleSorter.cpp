@@ -1,13 +1,8 @@
 //
 // Created by dima on 18.02.18.
 //
-
-#include <algorithm>
-#include "Sorter.h"
-
-
-
-void BubbleSorter::sort(int* a, size_t size) {
+template <typename T>
+void BubbleSorter<T>::sort(T* a, size_t size) {
 
     bool is_swapped = true;
     int r = size;

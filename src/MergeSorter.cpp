@@ -1,15 +1,13 @@
 //
 // Created by dima on 07.02.18.
 //
-
-#include "Sorter.h"
-#include <cstring>
-
-void MergeSorter::sort(int* a, size_t size) {
+template <typename T>
+void MergeSorter<T>::sort(T* a, size_t size) {
     merge_sort(a, size);
 }
 
-int* MergeSorter::merge(int *a, size_t size_a, int *b, size_t size_b){
+template <typename T>
+T* MergeSorter<T>::merge(T *a, size_t size_a, T *b, size_t size_b){
     int j = 0, i = 0;
     int *new_a = new int[size_a + size_b];
     int c = 0;
@@ -30,15 +28,20 @@ int* MergeSorter::merge(int *a, size_t size_a, int *b, size_t size_b){
     return new_a;
 }
 
-void MergeSorter::merge_sort(int *a, size_t size) {
+template <typename T>
+void MergeSorter<T>::merge_sort(T *a, size_t size) {
     if(size > 1) {
         int half = size / 2;
 
         merge_sort(a, half);
         merge_sort(a + half, size - half);
 
-        int * m = merge(a, half, a+half, size - half);
+        T * m = merge(a, half, a+half, size - half);
 
-        memcpy(a, m, size*sizeof(int));
+        // copy
+
+        for(int i = 0; i < size; i++){
+            a[i] = m[i];
+        }
     }
 }
