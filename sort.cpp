@@ -1,11 +1,10 @@
 //
 // Created by dima on 18.02.18.
 //
+
 #include <Sorter.h>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <algorithm>
 #include <cstdio>
 
 void printRawArray(int* a, size_t s){
@@ -42,32 +41,39 @@ bool test(Sorter<T>* sorter, T * sample, size_t size, float *outTime){
 }
 
 int main(){
-    constexpr int kSize = 10000;
+    constexpr int kSize = 100;
+    constexpr int kNumSorters = 5;
+
     int sample[kSize];
 
     for(int i = 0; i < kSize; i++){
         sample[i] = rand();
     }
 
-    Sorter<int> *ins, *sel, *bubble, *merge, *heap;
+    Sorter<int>* sorters[5] = {
+        new InsertionSorter<int>(),
+        new SelectionSorter<int>(),
+        new BubbleSorter<int>(),
+        new HeapSorter<int>(),
+        new MergeSorter<int>()
+    };
 
-    ins = new InsertionSorter<int>();
-    sel = new SelectionSorter<int>();
-    bubble = new BubbleSorter<int>();
-    heap = new HeapSorter<int>();
-    merge = new MergeSorter<int>();
 
-    float t[5]; bool c[5];
-    c[0] = test<int>(ins, sample, kSize, t);
-    c[1] = test<int>(sel, sample, kSize, t+1);
-    c[2] = test<int>(bubble, sample, kSize, t+2);
-    c[3] = test<int>(heap, sample, kSize, t+3);
-    c[4] = test<int>(merge, sample, kSize, t+4);
+    float t[5];
+    bool c[5];
+
+    for(int i = 0; i < kNumSorters; i++){
+        c[i] = test<int>(sorters[i], sample, kSize, t+i);
+    }
 
     printf("Insertion sort: %s, time = %f\n", (c[0]? "correct" : "failed"), t[0]);
     printf("Selection sort: %s, time = %f\n", (c[1]? "correct" : "failed"), t[1]);
     printf("Bubble sort: %s, time = %f\n", (c[2]? "correct" : "failed"), t[2]);
     printf("Heap sort: %s, time = %f\n", (c[3]? "correct" : "failed"), t[3]);
     printf("Merge sort: %s, time = %f\n", (c[4]? "correct" : "failed"), t[4]);
+
+    for(int i = 0; i < kNumSorters; i++){
+        delete sorters[i];
+    }
 
 }

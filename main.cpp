@@ -1,9 +1,8 @@
 #include <iostream>
-#include <vector>
 #include <String.h>
-#include <algorithm>
 #include <memory>
 #include <Exception.h>
+#include <algorithm>
 int main(){
     try{
     printf("My String class capabilities!\n");

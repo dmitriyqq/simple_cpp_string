@@ -13,4 +13,4 @@ add_executable(string_class_cpp main.cpp
 add_executable(sorting_class_cpp
         sort.cpp
         include/Sorter.h
-       )
+        include/Utils.h)

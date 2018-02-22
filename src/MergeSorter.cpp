@@ -43,5 +43,7 @@ void MergeSorter<T>::merge_sort(T *a, size_t size) {
         for(int i = 0; i < size; i++){
             a[i] = m[i];
         }
+
+        delete[] m;
     }
 }

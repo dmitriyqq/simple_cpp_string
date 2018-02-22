@@ -2,11 +2,12 @@
 // Created by dima on 18.02.18.
 //
 
-#include <algorithm>
 
 #ifndef STRING_CLASS_CPP_SORTER_H
 #define STRING_CLASS_CPP_SORTER_H
 
+#include "stdlib.h"
+#include  <algorithm>
 template <typename T>
 class Sorter {
 public:
@@ -53,7 +54,7 @@ public:
 template <typename T>
 class SelectionSorter : public Sorter<T>{
 public:
-    void sort(T* a, size_t sizev) override;
+    void sort(T* a, size_t size) override;
 };
 #include "SelectionSorter.cpp"
 
